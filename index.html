@@ -34,6 +34,15 @@ h1 .g{color:var(--gold2);}
   padding:12px 28px; border-radius:14px; box-shadow:0 7px 0 #b97e00, 0 12px 20px rgba(0,0,0,.3); transition:.12s; width:100%;}
 .play:hover{filter:brightness(1.06);} .play:active{transform:translateY(4px); box-shadow:0 3px 0 #b97e00;}
 .card.learn{border-color:#2a9d8f;} .card.learn:hover{border-color:#3fd6c4;}
+.card.locked{opacity:.62; filter:grayscale(.55);} .card.locked:hover{transform:none; border-color:rgba(255,255,255,.12);}
+.card.completed{border-color:#2ecc71;}
+.num.lock{background:#3a4a63; color:#cdd;} .num.done{background:linear-gradient(180deg,#38d17a,#1a9f74); color:#06251a;}
+.status{font-size:13px; font-weight:800; margin:2px 0 12px; color:#c1cfe0; min-height:18px;}
+.status.done{color:#8ff0c0;} .status.locked{color:#ff9aa0;}
+.play.locked{background:#3a4a63; color:#c8d2e0; box-shadow:none; cursor:not-allowed;}
+.play.locked:active{transform:none; box-shadow:none;}
+#toast{position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(120px); z-index:80; background:var(--ink); border:2px solid var(--gold); color:#fff; padding:12px 20px; border-radius:14px; font-weight:800; max-width:90vw; text-align:center; transition:transform .4s cubic-bezier(.2,1.4,.4,1); box-shadow:0 10px 30px rgba(0,0,0,.5);}
+#toast.show{transform:translateX(-50%) translateY(0);}
 .num.learn{background:linear-gradient(180deg,#3fd6c4,#1a7f74); color:#06251a;}
 .play.learn{background:linear-gradient(180deg,#38d17a,#1a9f74); box-shadow:0 7px 0 #147a4f, 0 12px 20px rgba(0,0,0,.3);}
 .play.learn:active{transform:translateY(4px); box-shadow:0 3px 0 #147a4f;}
@@ -67,7 +76,7 @@ h1 .g{color:var(--gold2);}
     <p class="teacher">✦ من إعداد المهندسة سلوان ✦</p>
   </div>
 
-  <p class="path-note">🧭 الترتيب المقترح للتعلّم — ابدأ من الأولى وامشِ بالترتيب:</p>
+  <p class="path-note">🔒 الألعاب تتفتّح بالترتيب — اكمل وحدة بدون أخطاء باش تفتح اللي بعدها · وتقدّمك محفوظ تلقائياً حتى لو رجعت بعد يوم 💾</p>
   <div class="grid" id="grid"></div>
 
   <div class="info">
@@ -79,25 +88,40 @@ h1 .g{color:var(--gold2);}
 </div>
 
 <script>
+const STAGES_PER=5;
 const GAMES=[
-  {n:1, e:"📦", t:"المتغيّرات", tag:"variables", d:"بايتي يتعلّم يتذكّر! خزّن المعلومات في الصناديق السحرية.", url:"https://selwanesmail.github.io/baytee-python-game/"},
-  {n:2, e:"🚦", t:"الشروط", tag:"if / else", d:"بايتي يتعلّم يقرّر بنفسه: لو… وإلا… باستخدام الشروط.", url:"https://selwanesmail.github.io/baytee-conditionals-game/"},
-  {n:3, e:"🔁", t:"التكرار", tag:"for loops", d:"بايتي ما يملّش! يعيد المهام مرّات كثيرة بأمر واحد.", url:"https://selwanesmail.github.io/baytee-loops-game/"},
+  {n:1, e:"📦", t:"المتغيّرات", tag:"variables", key:"baytee_python_game_v1", d:"بايتي يتعلّم يتذكّر! خزّن المعلومات في الصناديق السحرية.", url:"https://selwanesmail.github.io/baytee-python-game/"},
+  {n:2, e:"🚦", t:"الشروط", tag:"if / else", key:"baytee_conditions_game_v1", d:"بايتي يتعلّم يقرّر بنفسه: لو… وإلا… باستخدام الشروط.", url:"https://selwanesmail.github.io/baytee-conditionals-game/"},
+  {n:3, e:"🔁", t:"التكرار", tag:"for loops", key:"baytee_loops_game_v1", d:"بايتي ما يملّش! يعيد المهام مرّات كثيرة بأمر واحد.", url:"https://selwanesmail.github.io/baytee-loops-game/"},
   {learn:true, e:"📚", t:"تعلّم دوال القوائم", tag:"درس · شرح وأمثلة", d:"الدرس النظري قبل لعبة المصفوفات: append · pop · sort · index… بأسلوب قبل ➜ بعد.", url:"https://selwanesmail.github.io/baytee-learn-lists/"},
-  {n:4, e:"🗄️", t:"المصفوفات", tag:"lists", d:"بايتي ينظّم كنوزه في رفوف مرقّمة: فهرسة، قص، وترتيب.", url:"https://selwanesmail.github.io/baytee-lists-game/"},
-  {n:5, e:"🎨", t:"المصفوفة الثنائية", tag:"2D arrays", d:"بايتي في عالم الشبكة: صفوف وأعمدة ورسم بالبكسل!", url:"https://selwanesmail.github.io/baytee-grid-game/"},
+  {n:4, e:"🗄️", t:"المصفوفات", tag:"lists", key:"baytee_lists_game_v1", d:"بايتي ينظّم كنوزه في رفوف مرقّمة: فهرسة، قص، وترتيب.", url:"https://selwanesmail.github.io/baytee-lists-game/"},
+  {n:5, e:"🎨", t:"المصفوفة الثنائية", tag:"2D arrays", key:"baytee_grid_game_v1", d:"بايتي في عالم الشبكة: صفوف وأعمدة ورسم بالبكسل!", url:"https://selwanesmail.github.io/baytee-grid-game/"},
 ];
-document.getElementById("grid").innerHTML = GAMES.map(g=>{
-  const badge = g.learn ? `<div class="num learn">📚</div>` : `<div class="num">${g.n}</div>`;
-  const btn = g.learn ? `<a class="play learn" href="${g.url}">📚 اتعلّم</a>` : `<a class="play" href="${g.url}">▶ العب</a>`;
-  return `<div class="card${g.learn?' learn':''}">
-    ${badge}
-    <div class="emoji">${g.e}</div>
-    <span class="tag">${g.tag}</span>
-    <h3>${g.t}</h3>
-    <div class="desc">${g.d}</div>
-    ${btn}
-  </div>`;}).join("");
+function readProg(key){ try{ const s=JSON.parse(localStorage.getItem(key)); if(!s) return {done:0,unlocked:1,points:0}; return {done:Object.keys(s.done||{}).length, unlocked:s.unlocked||1, points:s.points||0}; }catch(e){ return {done:0,unlocked:1,points:0}; } }
+function toast(m){ let t=document.getElementById("toast"); if(!t){ t=document.createElement("div"); t.id="toast"; document.body.appendChild(t);} t.textContent=m; t.className="show"; clearTimeout(t._t); t._t=setTimeout(()=>t.className="",2600); }
+function lockMsg(name){ toast("🔒 لازم تكمّل «"+name+"» بدون أخطاء الأول باش تفتح هذي اللعبة!"); }
+function renderGrid(){
+  let prevDone=true, prevName="";
+  const html=GAMES.map(g=>{
+    if(g.learn){ return `<div class="card learn"><div class="num learn">📚</div><div class="emoji">${g.e}</div><span class="tag">${g.tag}</span><h3>${g.t}</h3><div class="desc">${g.d}</div><a class="play learn" href="${g.url}">📚 اتعلّم</a></div>`; }
+    const p=readProg(g.key), completed=p.done>=STAGES_PER, locked=!prevDone;
+    const badge = locked?`<div class="num lock">🔒</div>`:(completed?`<div class="num done">✔</div>`:`<div class="num">${g.n}</div>`);
+    let status, btn;
+    if(locked){ status=`<div class="status locked">🔒 اكمل «${prevName}» بدون أخطاء الأول</div>`; btn=`<button class="play locked" onclick="lockMsg('${prevName}')">🔒 مقفلة</button>`; }
+    else if(completed){ status=`<div class="status done">✅ مكتملة · 🪙 ${p.points} نقطة</div>`; btn=`<a class="play" href="${g.url}">🔁 العب من جديد</a>`; }
+    else if(p.done>0 || p.unlocked>1){ status=`<div class="status">📍 وصلت للمرحلة ${Math.min(p.unlocked,STAGES_PER)}/${STAGES_PER}</div>`; btn=`<a class="play" href="${g.url}">▶ أكمل</a>`; }
+    else { status=`<div class="status">🎮 جاهزة — ابدأ!</div>`; btn=`<a class="play" href="${g.url}">▶ العب</a>`; }
+    const cls="card"+(locked?" locked":"")+(completed?" completed":"");
+    const card=`<div class="${cls}">${badge}<div class="emoji">${g.e}</div><span class="tag">${g.tag}</span><h3>${g.t}</h3><div class="desc">${g.d}</div>${status}${btn}</div>`;
+    prevName=g.t; prevDone=completed;
+    return card;
+  }).join("");
+  document.getElementById("grid").innerHTML=html;
+}
+renderGrid();
+window.addEventListener("focus", renderGrid);
+window.addEventListener("pageshow", renderGrid);
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) renderGrid(); });
 
 /* نجوم الخلفية */
 (function(){ const c=document.getElementById("stars"),x=c.getContext("2d"); let st=[];
