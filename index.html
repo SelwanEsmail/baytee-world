@@ -33,6 +33,10 @@ h1 .g{color:var(--gold2);}
   background:linear-gradient(180deg,var(--gold),#f7a600); color:var(--ink); font-weight:900; font-size:17px;
   padding:12px 28px; border-radius:14px; box-shadow:0 7px 0 #b97e00, 0 12px 20px rgba(0,0,0,.3); transition:.12s; width:100%;}
 .play:hover{filter:brightness(1.06);} .play:active{transform:translateY(4px); box-shadow:0 3px 0 #b97e00;}
+.card.learn{border-color:#2a9d8f;} .card.learn:hover{border-color:#3fd6c4;}
+.num.learn{background:linear-gradient(180deg,#3fd6c4,#1a7f74); color:#06251a;}
+.play.learn{background:linear-gradient(180deg,#38d17a,#1a9f74); box-shadow:0 7px 0 #147a4f, 0 12px 20px rgba(0,0,0,.3);}
+.play.learn:active{transform:translateY(4px); box-shadow:0 3px 0 #147a4f;}
 .tag{display:inline-block; font-size:12px; color:var(--gold2); background:rgba(255,183,3,.12); border:1px solid rgba(255,183,3,.35);
   padding:3px 10px; border-radius:999px; margin-bottom:8px; font-weight:800; direction:ltr;}
 .foot{text-align:center; margin-top:34px; color:#9fb0c7; font-size:14px; line-height:2;}
@@ -79,18 +83,21 @@ const GAMES=[
   {n:1, e:"📦", t:"المتغيّرات", tag:"variables", d:"بايتي يتعلّم يتذكّر! خزّن المعلومات في الصناديق السحرية.", url:"https://selwanesmail.github.io/baytee-python-game/"},
   {n:2, e:"🚦", t:"الشروط", tag:"if / else", d:"بايتي يتعلّم يقرّر بنفسه: لو… وإلا… باستخدام الشروط.", url:"https://selwanesmail.github.io/baytee-conditionals-game/"},
   {n:3, e:"🔁", t:"التكرار", tag:"for loops", d:"بايتي ما يملّش! يعيد المهام مرّات كثيرة بأمر واحد.", url:"https://selwanesmail.github.io/baytee-loops-game/"},
+  {learn:true, e:"📚", t:"تعلّم دوال القوائم", tag:"درس · شرح وأمثلة", d:"الدرس النظري قبل لعبة المصفوفات: append · pop · sort · index… بأسلوب قبل ➜ بعد.", url:"https://selwanesmail.github.io/baytee-learn-lists/"},
   {n:4, e:"🗄️", t:"المصفوفات", tag:"lists", d:"بايتي ينظّم كنوزه في رفوف مرقّمة: فهرسة، قص، وترتيب.", url:"https://selwanesmail.github.io/baytee-lists-game/"},
   {n:5, e:"🎨", t:"المصفوفة الثنائية", tag:"2D arrays", d:"بايتي في عالم الشبكة: صفوف وأعمدة ورسم بالبكسل!", url:"https://selwanesmail.github.io/baytee-grid-game/"},
 ];
-document.getElementById("grid").innerHTML = GAMES.map(g=>`
-  <div class="card">
-    <div class="num">${g.n}</div>
+document.getElementById("grid").innerHTML = GAMES.map(g=>{
+  const badge = g.learn ? `<div class="num learn">📚</div>` : `<div class="num">${g.n}</div>`;
+  const btn = g.learn ? `<a class="play learn" href="${g.url}">📚 اتعلّم</a>` : `<a class="play" href="${g.url}">▶ العب</a>`;
+  return `<div class="card${g.learn?' learn':''}">
+    ${badge}
     <div class="emoji">${g.e}</div>
     <span class="tag">${g.tag}</span>
     <h3>${g.t}</h3>
     <div class="desc">${g.d}</div>
-    <a class="play" href="${g.url}">▶ العب</a>
-  </div>`).join("");
+    ${btn}
+  </div>`;}).join("");
 
 /* نجوم الخلفية */
 (function(){ const c=document.getElementById("stars"),x=c.getContext("2d"); let st=[];
