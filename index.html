@@ -96,6 +96,7 @@ const GAMES=[
   {learn:true, e:"📚", t:"تعلّم دوال القوائم", tag:"درس · شرح وأمثلة", d:"الدرس النظري قبل لعبة المصفوفات: append · pop · sort · index… بأسلوب قبل ➜ بعد.", url:"https://selwanesmail.github.io/baytee-learn-lists/"},
   {n:4, e:"🗄️", t:"المصفوفات", tag:"lists", key:"baytee_lists_game_v1", d:"بايتي ينظّم كنوزه في رفوف مرقّمة: فهرسة، قص، وترتيب.", url:"https://selwanesmail.github.io/baytee-lists-game/"},
   {n:5, e:"🎨", t:"المصفوفة الثنائية", tag:"2D arrays", key:"baytee_grid_game_v1", d:"بايتي في عالم الشبكة: صفوف وأعمدة ورسم بالبكسل!", url:"https://selwanesmail.github.io/baytee-grid-game/"},
+  {n:6, e:"⚙️", t:"الدوال", tag:"functions", key:"baytee_functions_game_v1", d:"بايتي المخترع يبني آلات (دوال): مدخلات، return، وقيم افتراضية.", url:"https://selwanesmail.github.io/baytee-functions-game/"},
 ];
 function readProg(key){ try{ const s=JSON.parse(localStorage.getItem(key)); if(!s) return {done:0,unlocked:1,points:0}; return {done:Object.keys(s.done||{}).length, unlocked:s.unlocked||1, points:s.points||0}; }catch(e){ return {done:0,unlocked:1,points:0}; } }
 function toast(m){ let t=document.getElementById("toast"); if(!t){ t=document.createElement("div"); t.id="toast"; document.body.appendChild(t);} t.textContent=m; t.className="show"; clearTimeout(t._t); t._t=setTimeout(()=>t.className="",2600); }
